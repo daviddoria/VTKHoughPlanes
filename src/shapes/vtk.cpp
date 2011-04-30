@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   hough.SHT(); // Standard Hough Transform
   
   std::cout << "Writing planes..." << std::endl;
-  hough.writePlanes("output.txt");
+  hough.writePlanes("output");
   
   return 0;
 }
