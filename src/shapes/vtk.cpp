@@ -49,24 +49,8 @@ int main(int argc, char *argv[])
   Hough hough(&scan);
   
   std::cout << "Created scan" << std::endl;
+  hough.SHT(); // Standard Hough Transform
   
-  // Choose Hough method here
-  plane_alg alg = SHT;
-    
-  switch(alg) 
-  {
-    case RHT: hough.RHT(); // Randomized Hough Transform
-              break;
-    case SHT: hough.SHT(); // Standard Hough Transform
-              break;
-    case PHT: hough.PHT(); // Probabilistic Hough Transform
-              break;
-    case PPHT:  hough.PPHT(); // Progressive Probabilistic Hough Transform
-                break;
-    case APHT:  hough.APHT(); // Adaptive Probabilistic Hough Transform
-                break;
-  }
-
   std::cout << "Writing planes..." << std::endl;
   hough.writePlanes("output.txt");
   
