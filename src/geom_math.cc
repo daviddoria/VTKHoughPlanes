@@ -1,5 +1,5 @@
 #include "math.h"
-#include "shapes/geom_math.h"
+#include "geom_math.h"
 
 float Nx,Ny,Nz,Nd;
 float Cx, Cy, Cz;

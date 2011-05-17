@@ -86,6 +86,6 @@ private:
   char PlaneDir[FNAME_LENGTH];
 
 };
-#include "shapes/ConfigFileHough.icc"
+#include "ConfigFileHough.icc"
 
 #endif

@@ -1,4 +1,4 @@
-#include "shapes/accumulator.h"
+#include "accumulator.h"
 #include <math.h>
 #include "slam6d/globals.icc"
 #include <iostream>

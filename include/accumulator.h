@@ -1,10 +1,10 @@
 #ifndef __ACCUMULATOR__
 #define __ACCUMULATOR__
 #include <set>
-#include "shapes/ConfigFileHough.h"
+#include "ConfigFileHough.h"
 #include "slam6d/point.h"
 using std::multiset;
-#include "shapes/hsm3d.h"
+#include "hsm3d.h"
 
 
 double* polar2normal(double theta, double phi);

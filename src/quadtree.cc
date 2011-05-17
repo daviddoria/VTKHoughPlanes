@@ -1,4 +1,4 @@
-#include "shapes/quadtree.h"
+#include "quadtree.h"
 
 int QuadTree::anz;
 double QuadTree::qSize;

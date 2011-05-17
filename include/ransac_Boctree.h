@@ -21,7 +21,7 @@ using std::list;
 #include <fstream>
 #include <string>
 
-#include "shapes/geom_math.h"
+#include "geom_math.h"
 
 #include "slam6d/globals.icc"
 #include "slam6d/Boctree.h"

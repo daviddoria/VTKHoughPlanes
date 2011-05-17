@@ -1,12 +1,12 @@
 #ifndef __HOUGH_PLANE_H__
 #define __HOUGH_PLANE_H__
 
-#include "shapes/convexplane.h"
-#include "shapes/ConfigFileHough.h"
+#include "convexplane.h"
+#include "ConfigFileHough.h"
 //#include "wykobi/wykobi_algorithm.hpp"
 #include "slam6d/point.h"
 #include "slam6d/scan.h"
-#include "shapes/accumulator.h"
+#include "accumulator.h"
 #include "newmat/newmatio.h"
 #include <iostream>
 using std::ofstream;

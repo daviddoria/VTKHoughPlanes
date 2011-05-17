@@ -56,7 +56,7 @@
 #ifndef __HSM3D_ICC__
 #define __HSM3D_ICC__
 
-#include "shapes/accumulator.h"
+#include "accumulator.h"
 
 bool real_compare(double x, double y) {
     return fabs(x - y) < 0.000000001;

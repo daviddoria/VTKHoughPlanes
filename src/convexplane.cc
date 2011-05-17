@@ -1,4 +1,4 @@
-#include "shapes/convexplane.h"
+#include "convexplane.h"
 #include "slam6d/globals.icc"
 using std::string;
 using std::ofstream;

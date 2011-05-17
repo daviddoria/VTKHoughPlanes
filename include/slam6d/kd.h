@@ -62,11 +62,11 @@ private:
    * Padded in the parallel case.
    */
 #ifdef _OPENMP
-#ifdef __INTEL_COMPILER
-  __declspec (align(16)) static KDParams params[MAX_OPENMP_NUM_THREADS];
-#else
-  static KDParams params[MAX_OPENMP_NUM_THREADS];
-#endif //__INTEL_COMPILER
+  #ifdef __INTEL_COMPILER
+    __declspec (align(16)) static KDParams params[MAX_OPENMP_NUM_THREADS];
+  #else
+    static KDParams params[MAX_OPENMP_NUM_THREADS];
+  #endif //__INTEL_COMPILER
 #else
   static KDParams params[MAX_OPENMP_NUM_THREADS];
 #endif	

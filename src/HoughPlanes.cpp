@@ -17,73 +17,35 @@
 
 #include <iostream>
 
-#include "shapes/hough.h"
-#include "shapes/shape.h"
-#include "shapes/ransac.h"
+#include "hough.h"
+#include "shape.h"
+#include "ransac.h"
 
 enum plane_alg { 
   RHT, SHT, PHT, PPHT, APHT, RANSAC
 };
 
-void writeVTP(Hough& hough) {
-  vtkSmartPointer<vtkPoints> outputdata = vtkSmartPointer<vtkPoints>::New();
-  
-  vtkSmartPointer<vtkUnsignedCharArray> colordata = vtkSmartPointer<vtkUnsignedCharArray>::New(); 
-  colordata->SetNumberOfComponents(3); 
-  colordata->SetName("Colors"); 
- 
-  Point p;
-  vector<Point>::iterator itr = hough.coloredPoints.begin();
-  while(itr != hough.coloredPoints.end()) {
-    p = *(itr);
-    colordata->InsertNextTupleValue(p.rgb);
-    outputdata->InsertNextPoint(p.x, p.y, p.z);
-    itr++;
-  }
-  itr = hough.allPoints->begin();
-  unsigned char gray[3] = {133,133,133}; 
-  while(itr != hough.allPoints->end()) {
-    p = *(itr);
-    colordata->InsertNextTupleValue(gray);
-    outputdata->InsertNextPoint(p.x, p.y, p.z);
-    itr++;
-  }
-  
-  vtkSmartPointer<vtkPolyData> firstpolydata = vtkSmartPointer<vtkPolyData>::New();
-  firstpolydata->SetPoints(outputdata);
-  
-  vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
-  vertexFilter->SetInputConnection(firstpolydata->GetProducerPort());
-  vertexFilter->Update();
-           
-  vtkSmartPointer<vtkPolyData> polyoutputdata = vtkSmartPointer<vtkPolyData>::New();
-  polyoutputdata->ShallowCopy(vertexFilter->GetOutput());
-  
-  polyoutputdata->GetPointData()->SetScalars(colordata);
-  
-  vtkSmartPointer<vtkPolyDataMapper> colorMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  colorMapper->SetInput(polyoutputdata);
-
-  vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-  writer->SetInput(polyoutputdata);
-  writer->SetFileName("outputtest.vtp");
-  writer->Write();
-}
+void writeVTP(Hough& hough, const std::string &outputFilename);
 
 int main(int argc, char *argv[])
 {
-  if(argc < 2) {
-    std::cerr << "Usage: " << argv[0] << " filename.vtp" << endl;
+  // Verify command line arguments
+  if(argc < 3)
+  {
+    std::cerr << "Usage: " << argv[0] << " input.vtp output.vtp" << endl;
     exit(1);
   }
-  std::string filename = argv[1];
+
+  // Parse command line arguments
+  std::string inputFilename = argv[1];
+  std::string outputFilename = argv[2];
   
   Scan scan;
   
   // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> reader =
     vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  reader->SetFileName(filename.c_str());
+  reader->SetFileName(inputFilename.c_str());
   reader->Update();
   
   vtkPolyData* polydata = reader->GetOutput();
@@ -112,10 +74,56 @@ int main(int argc, char *argv[])
   hough.writePlanes("output");
 
   // writes all points vtp file points colored by plane
-  writeVTP(hough);
+  writeVTP(hough, outputFilename);
 
   // writes all points as xyzrgb ascii file points colored by plane
-  hough.writePlanePoints("output");
+  //hough.writePlanePoints("output");
   
   return 0;
+}
+
+
+void writeVTP(Hough& hough, const std::string &outputFilename) {
+  vtkSmartPointer<vtkPoints> outputdata = vtkSmartPointer<vtkPoints>::New();
+
+  vtkSmartPointer<vtkUnsignedCharArray> colordata = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  colordata->SetNumberOfComponents(3);
+  colordata->SetName("Colors");
+
+  Point p;
+  vector<Point>::iterator itr = hough.coloredPoints.begin();
+  while(itr != hough.coloredPoints.end()) {
+    p = *(itr);
+    colordata->InsertNextTupleValue(p.rgb);
+    outputdata->InsertNextPoint(p.x, p.y, p.z);
+    itr++;
+  }
+  itr = hough.allPoints->begin();
+  unsigned char gray[3] = {133,133,133};
+  while(itr != hough.allPoints->end()) {
+    p = *(itr);
+    colordata->InsertNextTupleValue(gray);
+    outputdata->InsertNextPoint(p.x, p.y, p.z);
+    itr++;
+  }
+
+  vtkSmartPointer<vtkPolyData> firstpolydata = vtkSmartPointer<vtkPolyData>::New();
+  firstpolydata->SetPoints(outputdata);
+
+  vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+  vertexFilter->SetInputConnection(firstpolydata->GetProducerPort());
+  vertexFilter->Update();
+
+  vtkSmartPointer<vtkPolyData> polyoutputdata = vtkSmartPointer<vtkPolyData>::New();
+  polyoutputdata->ShallowCopy(vertexFilter->GetOutput());
+
+  polyoutputdata->GetPointData()->SetScalars(colordata);
+
+  vtkSmartPointer<vtkPolyDataMapper> colorMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  colorMapper->SetInput(polyoutputdata);
+
+  vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+  writer->SetInput(polyoutputdata);
+  writer->SetFileName(outputFilename.c_str());
+  writer->Write();
 }

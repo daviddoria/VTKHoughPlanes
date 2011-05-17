@@ -1,11 +1,11 @@
 #include "newmat/newmatap.h"
 using namespace NEWMAT;
-#include "shapes/hough.h"
+#include "hough.h"
 #include "slam6d/globals.icc"
 #include <math.h>
 #include <time.h>
 #include <limits>
-#include "shapes/quadtree.h"
+#include "quadtree.h"
 #include <errno.h>
 #include <dlfcn.h>
 #include <sys/stat.h>

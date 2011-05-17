@@ -1,7 +1,7 @@
-#include "shapes/ConfigFileHough.h"
+#include "ConfigFileHough.h"
 #include <string.h>
 #include <stdio.h>
-#include "shapes/parascan.h"
+#include "parascan.h"
 #include <iostream>
 
 using namespace std;

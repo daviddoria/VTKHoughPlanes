@@ -3,7 +3,7 @@
 
 #include "shape.h"
 #include "slam6d/scan.h"
-#include "shapes/ransac_Boctree.h"
+#include "ransac_Boctree.h"
 
 // TODO implement some parameters to modify ransac (maybe in CollisionShape?)
 template <class T>
