@@ -6,7 +6,6 @@
 using std::multiset;
 #include "hsm3d.h"
 
-
 double* polar2normal(double theta, double phi);
 
 /**

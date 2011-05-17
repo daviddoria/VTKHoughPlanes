@@ -80,7 +80,7 @@ class bitoct{
   unsigned valid              :  8;
   unsigned leaf               :  8;
 #else
-  signed long child_pointer   : 48;
+  signed long long child_pointer   : 48;
   unsigned valid              :  8;
   unsigned leaf               :  8;
 #endif

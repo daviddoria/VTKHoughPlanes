@@ -53,7 +53,8 @@ int main(int argc, char *argv[])
   std::cout << "Read file." << std::endl;
   
   vector<Point> points;
-  // Convert the points to a Scan object
+  
+  // Convert the points to a 'Scan' object needed by the HoughPlanes code
   for(vtkIdType pointIndex = 0; pointIndex < polydata->GetNumberOfPoints(); ++pointIndex)
   {
     double data[3];
@@ -65,20 +66,16 @@ int main(int argc, char *argv[])
   scan.setPoints(&points);
   scan.toGlobal(false,-1);
   Hough hough(&scan, true);
-  //hough.writeAllPoints(0, *(hough.allPoints)); 
-  std::cout << "Created scan" << std::endl;
+
   //hough.SHT(); // Standard Hough Transform
   hough.RHT(); // Randomized Hough Transform
   
   std::cout << "Writing planes..." << std::endl;
   hough.writePlanes("output");
 
-  // writes all points vtp file points colored by plane
+  // Write all points to a vtp file with a random color for each plane
   writeVTP(hough, outputFilename);
 
-  // writes all points as xyzrgb ascii file points colored by plane
-  //hough.writePlanePoints("output");
-  
   return 0;
 }
 
