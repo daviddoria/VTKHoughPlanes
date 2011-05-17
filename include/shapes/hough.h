@@ -39,7 +39,7 @@ public:
   int scanCounter;
   // TODO delete planes in Constructor
   vector<ConvexPlane*> planes;
-
+  vector<Point> coloredPoints;
   Hough(Scan * GlobalScan, bool quiet = true );
   ~Hough();
   void RHT();
@@ -60,6 +60,7 @@ public:
   void writePlanes();
   void writePlanes(std::string);
   int cluster(vPtPair &pairs, double minx, double max, double miny, double maxy);
+  void writePlanePoints(std::string);
   void writeAllPoints(int index, vector<Point> points);
 
 };

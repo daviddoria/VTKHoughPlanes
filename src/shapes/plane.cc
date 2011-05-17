@@ -55,7 +55,7 @@ void usage(char* prog) {
 
 	  << bold << "  -f" << normal << " F, " << bold << "--format=" << normal << "F" << endl
 	  << "         using shared library F for input" << endl
-	  << "         (chose F from {uos, uos_map, uos_rgb, uos_frames, uos_map_frames, old, rts, rts_map, ifp, riegl_txt, riegl_rgb, riegl_bin, zahn, ply})" << endl
+	  << "         (chose F from {uos, uos_map, uos_rgb, uos_frames, uos_map_frames, old, rts, rts_map, ifp, riegl_txt, riegl_rgb, riegl_bin, vtp, zahn, ply})" << endl
 	  << endl
 	  << bold << "  -m" << normal << " NR, " << bold << "--max=" << normal << "NR" << endl
 	  << "         neglegt all data points with a distance larger than NR 'units'" << endl
@@ -112,7 +112,7 @@ int parseArgs(int argc, char **argv, string &dir, double &red, int &start, int
     { "start",           required_argument,   0,  's' },
     { "reduce",          required_argument,   0,  'r' },
     { "plane",           required_argument,   0,  'p' },
-    { "quiet",            no_argument,         0,  'q' },
+    { "quiet",           no_argument,         0,  'q' },
     { "octree",          optional_argument,   0,  'O' },
     { 0,           0,   0,   0}                    // needed, cf. getopt.h
   };
@@ -287,6 +287,7 @@ int main(int argc, char **argv)
     }
 
     hough.writePlanes();
+    hough.writePlanePoints("scan001.3d");
     starttime = (GetCurrentTimeInMilliSec() - starttime);
   }
   

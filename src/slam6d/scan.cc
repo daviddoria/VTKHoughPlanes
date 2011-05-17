@@ -1303,6 +1303,7 @@ bool Scan::toType(const char* string, reader_type &type) {
   else if (strcasecmp(string, "front") == 0) type = FRONT;
   else if (strcasecmp(string, "x3d") == 0) type = X3D;
   else if (strcasecmp(string, "rxp") == 0) type = RXP;
+  else if (strcasecmp(string, "vtp") == 0) type = VTP;
   else if (strcasecmp(string, "ais") == 0) type = AIS;
   else if (strcasecmp(string, "oct") == 0) type = OCT;
   else if (strcasecmp(string, "xyzr") == 0) type = XYZR;
@@ -1405,6 +1406,9 @@ void Scan::readScans(reader_type type,
     break;
   case RXP:
     lib_string = "scan_io_rxp";
+    break;
+  case VTP:
+    lib_string = "scan_io_vtp";
     break;
   case AIS:
     lib_string = "scan_io_ais";

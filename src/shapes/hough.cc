@@ -115,6 +115,7 @@ void Hough::RHT() {
         //cout << rho << " " << theta << " " << phi << endl;
         double * n = acc->getMax(rho, theta, phi);
         planeSize = deletePoints(n, rho);
+        cout << "Delete Points done " << plane << endl;
         if(planeSize < (int)myConfigFileHough.Get_MinPlaneSize()) counter++;
         end = GetCurrentTimeInMilliSec() - start;
         start = GetCurrentTimeInMilliSec();
@@ -657,7 +658,6 @@ int Hough::deletePointsQuad(double * n, double rho) {
   for (int i = 0; i < nr_points; i++) {
     delete[] pppoints[i];
   }
-  cout << "E" << endl;
   delete[] pppoints;
   return max_points;
   
@@ -772,6 +772,10 @@ int Hough::deletePoints(double * n, double rho) {
   list< double*> point_list;
   
   vPtPair::iterator vitr;
+  unsigned char rgb[3];
+  for(int x = 0; x < 3; x++) {
+    rgb[x] = (unsigned char)((255)*(rand()/(RAND_MAX+1.0)));
+  }
   for(vitr = planePairs.begin(); vitr != planePairs.end(); vitr++) {
     
   // Case distinction x-z or x-y or y-z
@@ -782,6 +786,10 @@ int Hough::deletePoints(double * n, double rho) {
       point[0] = p2.x;
       point[1] = p2.y;
       point_list.push_back(point);
+      p.rgb[0] = rgb[0];
+      p.rgb[1] = rgb[1];
+      p.rgb[2] = rgb[2];
+      coloredPoints.push_back(p);
     } else {
       allPoints->push_back(p);
     }
@@ -792,12 +800,11 @@ int Hough::deletePoints(double * n, double rho) {
   ConvexPlane::JarvisMarchConvexHull(point_list,convex_hull);
 
   if(nocluster) return maxPlane; 
-
   ConvexPlane * plane1 = new ConvexPlane(n2, n2[3], direction, convex_hull);
   plane1->pointsize = maxPlane;
   planes.push_back(plane1);
 
-  cout << " " << allPoints->size() << "\n";
+  if(!quiet) cout << "Points left " << allPoints->size() << "\n";
 
   return maxPlane;
   // ENDE
@@ -939,12 +946,28 @@ int Hough::cluster(vPtPair &pairs, double minx, double maxx, double miny, double
   */
 void Hough::writePlanes() {
   int counter = 0;
+  string blub = "";
+  blub = blub + myConfigFileHough.Get_PlaneDir();
+#ifdef _MSC_VER
+  int success = mkdir(blub.c_str());
+#else
+  int success = mkdir(blub.c_str(), S_IRWXU|S_IRWXG|S_IRWXO);
+#endif
+
+  if(success != 0 && errno != EEXIST) { 
+    cerr << "Creating directory " << blub << " failed" << endl;
+    return;
+  }
+  
+  if(!quiet) cout << "Writing " << planes.size() << " Planes to " << blub << endl;
   
   ofstream out;
-  
-  out.open("test.txt");
+  string blub3 = blub + "/planes.list";
+  out.open(blub3.c_str());
   for(vector<ConvexPlane*>::iterator it = planes.begin(); it != planes.end(); it++) {
-    (*it)->writePlane("test.txt", counter);
+    string blub2 = blub + "/plane"+ to_string(counter,3) + ".3d";
+    out << "Plane " << blub2 << endl;
+    (*it)->writePlane(blub2, counter);
     counter++;
   }
 
@@ -969,6 +992,32 @@ void Hough::writePlanes(std::string filePrefix)
     counter++;
   }
 
+}
+/**
+  * Writes the remaining points from allPoints to the plane directory given in
+  * the config file.
+  */
+void Hough::writePlanePoints(string filename) {
+
+  ofstream out;
+  out.open(filename.c_str());
+
+  Point p;
+  vector<Point>::iterator itr = coloredPoints.begin();
+ 
+  while(itr != coloredPoints.end()) {
+    p = *(itr);
+    out << p.x << " " << p.y << " " << p.z << " " << (int)p.rgb[0] << " " << (int)(p.rgb[1]) << " " << (int)(p.rgb[2]) << endl;
+    itr++;
+  }
+  itr = allPoints->begin();
+  
+  while(itr != allPoints->end()) {
+    p = *(itr);
+    out << p.x << " " << p.y << " " << p.z << " " << 255 << " " << 255 << " " << 255 << endl;
+    itr++;
+  }
+  out.close();
 }
 
 /**
@@ -1000,7 +1049,7 @@ void Hough::writeAllPoints(int index, vector<Point> points) {
   
   while(itr != points.end()) {
     p = *(itr);
-    out << p.x << " " << p.y << " " << p.z << endl;
+    out << p.x << " " << p.y << " " << p.z << " " << (int)p.rgb[0] << " " << (int)(p.rgb[1]) << " " << (int)(p.rgb[2]) << endl;
     itr++;
   }
   out.close();
