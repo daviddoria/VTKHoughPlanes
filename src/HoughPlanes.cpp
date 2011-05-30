@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
   
   std::cout << "Writing planes..." << std::endl;
   hough.writePlanes("output");
+  hough.writePlanePoints("data/scans/scan000.3d"); 
 
   // Write all points to a vtp file with a random color for each plane
   writeVTP(hough, outputFilename);

@@ -14,7 +14,7 @@ using std::ofstream;
 
 bool ConvexPlane::furtherleft(double * start, double * point, double * end) {
   double tmp = (end[0] - start[0])*(point[1] - start[1]) - (point[0] - start[0])*(end[1] - start[1]); 
-  if(fabs(tmp) < 0.000001) {
+  if(fabs(tmp) < 0.0000000001) {
     double l1 = (point[0] - start[0])*(point[0] - start[0]) 
               + (point[1] - start[1])*(point[1] - start[1]);
     double l2 = (end[0] - start[0])*(end[0] - start[0]) 
@@ -187,8 +187,59 @@ ConvexPlane::ConvexPlane(double plane[4], vector<Point> &points ) {
 }
 
 /**
-  * Writes the plane as planeXXX.3d to the directory given in the path. XXX is
+  * Writes the plane as normalXXX.3d to the directory given in the path. XXX is
   * the three digit representation of the counter.
+  * This function writes the center and the normal of the plane to the file.
+  */
+void ConvexPlane::writeNormal(string path, int counter) {
+  ofstream out;
+  out.open(path.c_str());
+  double center[3];
+  for(int i = 0; i < 3; i++) {
+    center[i] = 0.0;
+  }
+  
+  for(vector<double*>::iterator it = convex_hull.begin();
+      it != convex_hull.end();
+      it++) {
+
+    
+    switch(direction) {
+      case 'x': 
+        center[0] += (rho - (*it)[0] * n[1] - (*it)[1] * n[2]) / n[0];
+        center[1] += (*it)[0];
+        center[2] += (*it)[1];
+        break;
+      case 'y':
+        center[0] += (*it)[0];
+        center[1] += (rho - (*it)[0] * n[0] - (*it)[1] * n[2]) / n[1];
+        center[2] += (*it)[1];
+        break;
+      case 'z': 
+        center[0] += (*it)[0];
+        center[1] += (*it)[1];
+        center[2] += (rho - (*it)[0] * n[0] - (*it)[1] * n[1]) / n[2];
+        break;
+      default: cout << "OHOH" << endl;
+    }
+
+  }
+  
+  for(int i = 0; i < 3; i++) {
+    center[i] /= convex_hull.size();
+  }
+
+
+  out << n[0] << " " << n[1] << " " << n[2] << endl;
+  out << center[0] << " " << center[1] << " " << center[2] << endl;
+
+  out.close();
+
+}
+
+/**
+  * Writes the convex hull of the plane as planeXXX.3d to the directory given in the path.
+  * XXX is the three digit representation of the counter. 
   */
 void ConvexPlane::writePlane(string path, int counter) {
 
@@ -199,7 +250,7 @@ void ConvexPlane::writePlane(string path, int counter) {
       it != convex_hull.end();
       it++) {
 
-
+    
     switch(direction) {
       case 'x': 
         out << (rho - (*it)[0] * n[1] - (*it)[1] * n[2]) / n[0] << " ";

@@ -80,9 +80,16 @@ class bitoct{
   unsigned valid              :  8;
   unsigned leaf               :  8;
 #else
+#ifdef BIT_64
+  cout << "blub" << endl;
+  signed long child_pointer   : 48;
+  unsigned valid              :  8;
+  unsigned leaf               :  8;
+#else  
   signed long long child_pointer   : 48;
   unsigned valid              :  8;
   unsigned leaf               :  8;
+#endif
 #endif
   /**
    * sets the child pointer of parent so it points to child 
