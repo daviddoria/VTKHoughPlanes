@@ -36,7 +36,7 @@ public:
   
   ConfigFileHough();
 
-  unsigned int LoadCfg(char *CfgFile);
+  unsigned int LoadCfg(const char *CfgFile);
   void ShowConfiguration();
 
   inline char* Get_CfgFileName();

@@ -21,11 +21,11 @@ using namespace NEWMAT;
   * March 2011.
   */
 
-Hough::Hough(Scan * GlobalScan, bool q) {
+Hough::Hough(Scan * GlobalScan, bool q, std::string configFile) {
  
   quiet = q;
-  char CfgFileName[] = "bin/hough.cfg";
-  myConfigFileHough.LoadCfg(CfgFileName); 
+  
+  myConfigFileHough.LoadCfg(configFile.c_str());
   cout << "Loaded Configfile" << endl;
   if(!quiet) {
     myConfigFileHough.ShowConfiguration();
@@ -58,8 +58,8 @@ Hough::Hough(Scan * GlobalScan, bool q) {
       acc = new AccumulatorBallI(myConfigFileHough);
       break;
   }
-  //srand(time(0));
-  srand(0);
+  srand(time(0)); // make the results actually random
+  //srand(0); // make the results repeatable
   
 }
 

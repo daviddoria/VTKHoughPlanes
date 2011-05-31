@@ -3,7 +3,11 @@
  * @author Dorit Borrmann. Institute of Computer Science, University of Osnabrueck, Germany.
 */
 
-
+/**
+ * This program accepts a vtp file containing a point cloud and attempts to fit many planes
+ * to the points. The output is a vtp file containing the input points colored by which plane,
+ * if any, they belong to. The colors of the planes are randomly assigned.
+ */ 
 #include <vtkXMLPolyDataReader.h>
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
@@ -71,8 +75,8 @@ int main(int argc, char *argv[])
   hough.RHT(); // Randomized Hough Transform
   
   std::cout << "Writing planes..." << std::endl;
-  hough.writePlanes("output");
-  hough.writePlanePoints("data/scans/scan000.3d"); 
+  //hough.writePlanes("output");
+  //hough.writePlanePoints("data/scans/scan000.3d"); 
 
   // Write all points to a vtp file with a random color for each plane
   writeVTP(hough, outputFilename);
@@ -88,6 +92,7 @@ void writeVTP(Hough& hough, const std::string &outputFilename) {
   colordata->SetNumberOfComponents(3);
   colordata->SetName("Colors");
 
+  // Color all points that belong to a plane a random color
   Point p;
   vector<Point>::iterator itr = hough.coloredPoints.begin();
   while(itr != hough.coloredPoints.end()) {
@@ -96,6 +101,8 @@ void writeVTP(Hough& hough, const std::string &outputFilename) {
     outputdata->InsertNextPoint(p.x, p.y, p.z);
     itr++;
   }
+
+  // Color all points that do not belong to a plane gray
   itr = hough.allPoints->begin();
   unsigned char gray[3] = {133,133,133};
   while(itr != hough.allPoints->end()) {
