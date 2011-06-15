@@ -62,7 +62,7 @@ public:
   inline unsigned int Get_AccumulatorType();     
   inline char* Get_PlaneDir();  
 
-private:
+//private: // Parameters are public to avoid having to create mutator functions
 
   char CfgFileName[FNAME_LENGTH];
   double MaxDist;

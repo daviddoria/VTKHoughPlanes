@@ -21,28 +21,47 @@ using namespace NEWMAT;
   * March 2011.
   */
 
-Hough::Hough(Scan * GlobalScan, bool q, std::string configFile) {
- 
+Hough::Hough(bool q, std::string configFile)
+{
   quiet = q;
-  
-  myConfigFileHough.LoadCfg(configFile.c_str());
-  cout << "Loaded Configfile" << endl;
-  if(!quiet) {
+
+  // If the user has specified a configFile, load it
+  if(configFile.size() > 0)
+    {
+    myConfigFileHough.LoadCfg(configFile.c_str());
+    std::cout << "Loaded Configfile" << std::endl;
+    }
+
+  if(!quiet)
+    {
     myConfigFileHough.ShowConfiguration();
-  }
+    }
+}
+
+Hough::Hough(Scan * GlobalScan, bool q, std::string configFile)
+{
+ 
+  Hough(q, configFile);
+
+  SetScan(GlobalScan);
+}
+
+void Hough::SetScan(Scan* scan)
+{
 
   nrEntries = 0;
   maximum = false;
 
   planeCounter = 0;
-  
+
   allPoints = new vector<Point>();
 
-  double* const* points_red = GlobalScan->get_points_reduced();
-  for(int i = 0; i < GlobalScan->get_points_red_size(); i++) {
+  double* const* points_red = scan->get_points_reduced();
+  for(int i = 0; i < scan->get_points_red_size(); i++)
+    {
     Point p(points_red[i]);
     allPoints->push_back(p);
-  }
+    }
 
   switch(myConfigFileHough.Get_AccumulatorType()) {
     case 0:
@@ -50,7 +69,7 @@ Hough::Hough(Scan * GlobalScan, bool q, std::string configFile) {
       break;
     case 1:
       acc = new AccumulatorBall(myConfigFileHough);
-      break;   
+      break;
     case 2:
       acc = new AccumulatorCube(myConfigFileHough);
       break;
@@ -60,7 +79,6 @@ Hough::Hough(Scan * GlobalScan, bool q, std::string configFile) {
   }
   srand(time(0)); // make the results actually random
   //srand(0); // make the results repeatable
-  
 }
 
 /**

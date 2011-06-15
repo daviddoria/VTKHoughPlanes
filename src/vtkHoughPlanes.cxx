@@ -18,7 +18,6 @@
 
 #include <iostream>
 
-#include "hough.h"
 #include "shape.h"
 #include "ransac.h"
 
@@ -28,6 +27,103 @@ vtkHoughPlanes::vtkHoughPlanes()
 {
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
+
+  this->HoughAlgorithm = Randomized;
+}
+
+void vtkHoughPlanes::SetHoughAlgorithm(HoughAlgorithmEnum algorithm)
+{
+  this->HoughAlgorithm = algorithm;
+}
+
+void vtkHoughPlanes::SetMaxDist(double maxDist)
+{
+  this->m_Hough.myConfigFileHough.MaxDist = maxDist;
+}
+
+void vtkHoughPlanes::SetMinDist(double minDist)
+{
+  this->m_Hough.myConfigFileHough.MinDist = minDist;
+}
+
+void vtkHoughPlanes::SetAccumulatorMax(unsigned int accumulatorMax)
+{
+  this->m_Hough.myConfigFileHough.AccumulatorMax = accumulatorMax;
+}
+
+void vtkHoughPlanes::SetMinSizeAllPoints(unsigned int minSizeAllPoints)
+{
+  this->m_Hough.myConfigFileHough.MinSizeAllPoints = minSizeAllPoints;
+}
+
+void vtkHoughPlanes::SetRhoNum(unsigned int rhoNum)
+{
+  this->m_Hough.myConfigFileHough.RhoNum = rhoNum;
+}
+
+void vtkHoughPlanes::SetThetaNum(unsigned int thetaNum)
+{
+  this->m_Hough.myConfigFileHough.ThetaNum = thetaNum;
+}
+
+void vtkHoughPlanes::SetPhiNum(unsigned int phiNum)
+{
+  this->m_Hough.myConfigFileHough.PhiNum = phiNum;
+}
+
+void vtkHoughPlanes::SetRhoMax(unsigned int rhoMax)
+{
+  this->m_Hough.myConfigFileHough.RhoMax = rhoMax;
+}
+
+void vtkHoughPlanes::SetMaxPointPlaneDist(double maxPointPlaneDist)
+{
+  this->m_Hough.myConfigFileHough.MaxPointPlaneDist = maxPointPlaneDist;
+}
+
+void vtkHoughPlanes::SetMaxPlanes(unsigned int maxPlanes)
+{
+  this->m_Hough.myConfigFileHough.MaxPlanes = maxPlanes;
+}
+
+void vtkHoughPlanes::SetMinPlaneSize(unsigned int minPlaneSize)
+{
+  this->m_Hough.myConfigFileHough.MinPlaneSize = minPlaneSize;
+}
+
+void vtkHoughPlanes::SetMinPlanarity(double minPlanarity)
+{
+  this->m_Hough.myConfigFileHough.MinPlanarity = minPlanarity;
+}
+
+void vtkHoughPlanes::SetPlaneRatio(double planeRatio)
+{
+  this->m_Hough.myConfigFileHough.PlaneRatio = planeRatio;
+}
+
+void vtkHoughPlanes::SetPointDist(double pointDist)
+{
+  this->m_Hough.myConfigFileHough.PointDist = pointDist;
+}
+
+void vtkHoughPlanes::SetPeakWindow(bool peakWindow)
+{
+  this->m_Hough.myConfigFileHough.PeakWindow = peakWindow;
+}
+
+void vtkHoughPlanes::SetWindowSize(unsigned int windowSize)
+{
+  this->m_Hough.myConfigFileHough.WindowSize = windowSize;
+}
+
+void vtkHoughPlanes::SetTrashMax(unsigned int trashMax)
+{
+  this->m_Hough.myConfigFileHough.TrashMax = trashMax;
+}
+
+void vtkHoughPlanes::SetAccumulatorType(unsigned int accumulatorType)
+{
+  this->m_Hough.myConfigFileHough.AccumulatorType = accumulatorType;
 }
 
 int vtkHoughPlanes::RequestData(vtkInformation *vtkNotUsed(request),
@@ -60,12 +156,17 @@ int vtkHoughPlanes::RequestData(vtkInformation *vtkNotUsed(request),
 
   scan.setPoints(&points);
   scan.toGlobal(false,-1);
-  Hough hough(&scan, true);
+  this->m_Hough.SetScan(&scan);
 
-  //hough.SHT(); // Standard Hough Transform
-  hough.RHT(); // Randomized Hough Transform
+  if(this->HoughAlgorithm == Randomized)
+    {
+    this->m_Hough.RHT(); // Randomized Hough Transform
+    }
+  else if(this->HoughAlgorithm == Standard)
+    {
+    this->m_Hough.SHT(); // Standard Hough Transform
+    }
 
-  std::cout << "Writing planes..." << std::endl;
   //hough.writePlanes("output");
   //hough.writePlanePoints("data/scans/scan000.3d");
 
@@ -78,8 +179,8 @@ int vtkHoughPlanes::RequestData(vtkInformation *vtkNotUsed(request),
 
   // Color all points that belong to a plane a random color
   Point p;
-  vector<Point>::iterator itr = hough.coloredPoints.begin();
-  while(itr != hough.coloredPoints.end())
+  vector<Point>::iterator itr = this->m_Hough.coloredPoints.begin();
+  while(itr != this->m_Hough.coloredPoints.end())
     {
     p = *(itr);
     colors->InsertNextTupleValue(p.rgb);
@@ -88,9 +189,9 @@ int vtkHoughPlanes::RequestData(vtkInformation *vtkNotUsed(request),
     }
 
   // Color all points that do not belong to a plane gray
-  itr = hough.allPoints->begin();
+  itr = this->m_Hough.allPoints->begin();
   unsigned char gray[3] = {133,133,133};
-  while(itr != hough.allPoints->end())
+  while(itr != this->m_Hough.allPoints->end())
     {
     p = *(itr);
     colors->InsertNextTupleValue(gray);

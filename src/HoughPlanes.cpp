@@ -32,8 +32,28 @@ int main(int argc, char *argv[])
   vtkSmartPointer<vtkHoughPlanes> houghPlanes =
     vtkSmartPointer<vtkHoughPlanes>::New();
   houghPlanes->SetInputConnection(reader->GetOutputPort());
+  houghPlanes->SetMaxDist(2.00);
+  houghPlanes->SetMinDist(0.10);
+  houghPlanes->SetAccumulatorMax(100);
+  houghPlanes->SetMinSizeAllPoints(5);
+  houghPlanes->SetRhoNum(100);
+  houghPlanes->SetThetaNum(360);
+  houghPlanes->SetPhiNum(176);
+  houghPlanes->SetRhoMax(5.00);
+  houghPlanes->SetMaxPointPlaneDist(0.050);
+  houghPlanes->SetMaxPlanes(30);
+  houghPlanes->SetMinPlaneSize(100);
+  houghPlanes->SetMinPlanarity(0.300);
+  houghPlanes->SetPlaneRatio(0.5);
+  houghPlanes->SetPointDist(0.050);
+  houghPlanes->SetPeakWindow(false);
+  houghPlanes->SetWindowSize(8);
+  houghPlanes->SetTrashMax(20);
+  houghPlanes->SetAccumulatorType(1);
+  houghPlanes->SetHoughAlgorithm(vtkHoughPlanes::Randomized);
   houghPlanes->Update();
 
+  // Write output points colored by plane
   vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   writer->SetInputConnection(houghPlanes->GetOutputPort());
   writer->SetFileName(outputFileName.c_str());

@@ -40,8 +40,10 @@ public:
   // TODO delete planes in Constructor
   vector<ConvexPlane*> planes;
   vector<Point> coloredPoints;
-  
+
+  Hough(bool quiet = true, std::string configFile = ""); // this constructor allows the Scan to be set later
   Hough(Scan * GlobalScan, bool quiet = true, std::string configFile = "hough.cfg" );
+  void SetScan(Scan*);
   ~Hough();
   void RHT();
   void SHT();
