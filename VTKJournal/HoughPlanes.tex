@@ -4,7 +4,7 @@
 \usepackage{float}
 \usepackage{subfigure}
 \usepackage{nicefrac}
-\usepackage{bbm,amsmath,amssymb}
+\usepackage{amsmath,amssymb}%bbm,}
 \usepackage[dvips,
 bookmarks,
 bookmarksopen,
@@ -64,7 +64,7 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 
 \begin{abstract}
 \noindent
-This document presents a wrapper of an extracted portion of `3DTK - The 3D Toolkit' (http://threedtk.de) to enable a developer to find planes in 3D point cloud data.
+This document presents a VTK wrapper of an extracted portion of `3DTK - The 3D Toolkit' (http://threedtk.de) to enable a developer to find planes in 3D point cloud data.
 
 \vspace{14pt}
 
@@ -78,6 +78,8 @@ This document presents a wrapper of an extracted portion of `3DTK - The 3D Toolk
 \IJhandlenote{\IJhandlerIDnumber}
 
 \tableofcontents
+
+%%%%%%%%%%%%
 \section{Introduction}
 Finding planes in 3D point clouds is a very common operation. This code uses the
 Hough Transform to find the strongest planes in a point cloud and then labels
@@ -86,9 +88,10 @@ implemented in 3DTK are explained in detail in~\cite{Borrmann:2011}. A very
 brief description is also given in the following section. For a more detailed view please refer to
 the original article.
 
+%%%%%%%%%%%%
 \section{The Hough Transform}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \subfigure[Polar coordinates of normal vector]{
 \includegraphics[width=0.33\textwidth]{images/polar1}
@@ -222,7 +225,8 @@ The vtkHoughPlanes class must be passed an input vtkPolyData via SetInputConnect
   houghPlanes->Update();
 
   // Write output points colored by plane
-  vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+  vtkSmartPointer<vtkXMLPolyDataWriter> writer = 
+    vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   writer->SetInputConnection(houghPlanes->GetOutputPort());
   writer->SetFileName(outputFileName.c_str());
   writer->Write();
@@ -250,7 +254,7 @@ General parameters:
 types: 
 \begin{enumerate}
 \item[1:] the Accumulator Array with a linear discretization of the Hough Space,
-\item[2:] the Accumulator Ball with similar cell sizes when the Hough Space ius mapped
+\item[2:] the Accumulator Ball with similar cell sizes when the Hough Space is mapped
 onto the unit sphere, 
 \item[3:] the Accumulator Cube where the discretization is based
 on projecting a cube onto the unit sphere, 
@@ -332,14 +336,5 @@ selected to calculate the model plane for the Randomized Hough Transform.
 
 \bibliographystyle{plain}
 \bibliography{papers}
-%%%%%%%%%%%%%%%
-% \begin{thebibliography}{9}
-% 
-% 	\bibitem{criminisi}
-% 	  A. Criminisi, P. Perez, K. Toyama,
-% 	  \emph{Object Removal by Exemplar-Based Inpainting}.
-% 	  Computer Vision and Pattern Recognition 2003
-% 
-% \end{thebibliography}
 
 \end{document}
