@@ -322,7 +322,7 @@ void Hough::PPHT() {
       if(!voted[pint]) {
         double * angles = acc->accumulateRet(p);
         if(angles[0] > -0.0001) {
-          double * n = acc->getMax(angles[0], angles[1], angles[2]);
+          double * n = polar2normal(angles[1], angles[2]);
           deletePoints(n, angles[0]);
           acc->resetAccumulator();
           delete [] n;
@@ -473,8 +473,14 @@ void Hough::APHT() {
       }
     }
     // repeat until maximum stability count exceeds a threshold
-  } while(max < (int)myConfigFileHough.Get_AccumulatorMax());
-
+  } while(max < (int)myConfigFileHough.Get_AccumulatorMax()
+  && stability[myConfigFileHough.Get_MaxPlanes()] < 
+  myConfigFileHough.Get_AccumulatorMax() * myConfigFileHough.Get_PlaneRatio()
+  );
+  if(stability[myConfigFileHough.Get_MaxPlanes()] >= myConfigFileHough.Get_AccumulatorMax() * myConfigFileHough.Get_PlaneRatio()) {
+    maxpos = myConfigFileHough.Get_MaxPlanes();
+  }
+  
   for(int i = 0; i <= maxpos; i++) {
     double * n = acc->getMax(mergelist[i]); 
     deletePoints(n, n[3]);
@@ -838,7 +844,7 @@ int Hough::cluster(vPtPair &pairs, double minx, double maxx, double miny, double
   if(pairs.size() < 3) return -1;
   vPtPair::iterator vitr;
   vector<set<int> > linked;
-  double factor = myConfigFileHough.Get_MaxPointPlaneDist()*3;
+  double factor = myConfigFileHough.Get_PointDist();
   int xlength = 1 + (maxx - minx) / factor;
   int ylength = 1 + (maxy - miny) / factor; 
 

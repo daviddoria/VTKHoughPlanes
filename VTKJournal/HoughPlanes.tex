@@ -4,7 +4,7 @@
 \usepackage{float}
 \usepackage{subfigure}
 \usepackage{nicefrac}
-\usepackage{amsmath,amssymb}%bbm,}
+\usepackage{amsmath,amssymb}
 \usepackage[dvips,
 bookmarks,
 bookmarksopen,
@@ -13,7 +13,7 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 ]{hyperref}
 \newcommand{\M}[1]{\mathbf{#1}}
 \newcommand{\V}[1]{\mathbf{#1}}
-
+\newcommand{\X}{XXXXXXXXXXXXX}
 \title{Hough Transform Plane Detector}
 
 % 
@@ -105,7 +105,7 @@ the original article.
 \includegraphics[width=0.25\textwidth]{images/accumulator}
 \label{fig:accumulator}
 }
-\caption{The Hough Transform}
+\caption{The Hough Transform.}
 \end{figure}
 
 The Hough Transform \cite{Hough:1962, Duda:1971} is a method for detecting parametrized
@@ -249,7 +249,7 @@ implementation does not depend on any unit of measurement. However, it is
 indispensible that the units of the parameters match with the units used for the input data.
 
 General parameters:
-\begin{liste}{MinSizeAllPointsllllllll}
+\begin{liste}{\X}
 \item[\texttt{AccumulatorType}] The software offers different accumulator
 types: 
 \begin{enumerate}
@@ -267,7 +267,7 @@ RHT, PHT, PPHT, and APHT.
 
 The different Hough methods have various stopping rules. The following
 parameters are used to define the thresholds for these stopping rules:
-\begin{liste}{MinSizeAllPointsllllllll}
+\begin{liste}{\X}
 \item[\texttt{MinSizeAllPoints}] Defines a threshold when to stop applying
 the Hough Transform. The number indicates the percentage of points from the
 input point cloud that have not been asigned to a plane.
@@ -285,7 +285,7 @@ points is too low.
 For practical applications the Hough Space is discretized. The following
 parameters define the discretization:
 
-\begin{liste}{MinSizeAllPointslllllll}
+\begin{liste}{\X}
 \item[\texttt{RhoMax}] Defines the maximum distance $\rho_{max}$ of a plane from the origin for
 discretization.
 \item[\texttt{RhoNum}] Defines the number of cells $\rho_{N}$ in direction of $\rho$. Each cell
@@ -297,7 +297,7 @@ cell has the size $\nicefrac{\varphi_{N}}{\varphi_{N}}$.
 
 Plane parameters:
 
-\begin{liste}{MinSizeAllPointslllllll}
+\begin{liste}{\X}
 \item[\texttt{MaxPointPlaneDist}] Maximal distance between a point and the
 plane so that the point is still considered to belong to the plane. This
 parameter is used to compensate measurement noise and discretization.
@@ -310,7 +310,7 @@ eigenvalue devided by the number of points.
 
 Additional parameters for certain algorithms:
 
-\begin{liste}{MinSizeAllPointslllllll}
+\begin{liste}{\X}
 \item[\texttt{PlaneRatio}] For the SHT and the PHT the maxima in the
 accumulator are determined after the accumulation phase is completed. The
 \texttt{PlaneRatio} is a threshold $r$ that determines which maxima from the
@@ -326,10 +326,10 @@ accumulator that are close to each other.
 peak detection.
 \end{liste}
 
-\begin{liste}{MinSizeAllPointsllllllll}
+\begin{liste}{\X}
 \item[\texttt{MinDist}] Sets the minimum distance for the three points
 selected to calculate the model plane for the Randomized Hough Transform.
-\item[\texttt{AccumulatorMay}] Sets the maximum distance for the three points
+\item[\texttt{AccumulatorMax} Sets the maximum distance for the three points
 selected to calculate the model plane for the Randomized Hough Transform.
 
 \end{liste}

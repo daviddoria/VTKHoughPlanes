@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
   if(argc < 3)
   {
     std::cerr << "Usage: " << argv[0] << " input.vtp output.vtp" << endl;
-    exit(1);
+    exit(0);
   }
 
   // Parse command line arguments
@@ -34,17 +34,17 @@ int main(int argc, char *argv[])
   houghPlanes->SetInputConnection(reader->GetOutputPort());
   houghPlanes->SetMaxDist(2.00);
   houghPlanes->SetMinDist(0.10);
-  houghPlanes->SetAccumulatorMax(100);
+  houghPlanes->SetAccumulatorMax(50);
   houghPlanes->SetMinSizeAllPoints(5);
   houghPlanes->SetRhoNum(100);
   houghPlanes->SetThetaNum(360);
   houghPlanes->SetPhiNum(176);
   houghPlanes->SetRhoMax(5.00);
   houghPlanes->SetMaxPointPlaneDist(0.050);
-  houghPlanes->SetMaxPlanes(30);
+  houghPlanes->SetMaxPlanes(6);
   houghPlanes->SetMinPlaneSize(100);
   houghPlanes->SetMinPlanarity(0.300);
-  houghPlanes->SetPlaneRatio(0.5);
+  houghPlanes->SetPlaneRatio(0.1);
   houghPlanes->SetPointDist(0.050);
   houghPlanes->SetPeakWindow(false);
   houghPlanes->SetWindowSize(8);

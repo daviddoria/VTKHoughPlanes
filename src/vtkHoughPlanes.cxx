@@ -158,14 +158,23 @@ int vtkHoughPlanes::RequestData(vtkInformation *vtkNotUsed(request),
   scan.toGlobal(false,-1);
   this->m_Hough.SetScan(&scan);
 
-  if(this->HoughAlgorithm == Randomized)
-    {
-    this->m_Hough.RHT(); // Randomized Hough Transform
-    }
-  else if(this->HoughAlgorithm == Standard)
-    {
-    this->m_Hough.SHT(); // Standard Hough Transform
-    }
+  switch(this->HoughAlgorithm) {
+    case Randomized:
+      this->m_Hough.RHT(); // Randomized Hough Transform
+      break;
+    case Standard:
+      this->m_Hough.SHT(); // Standard Hough Transform
+      break;
+    case Probabilistic:
+      this->m_Hough.PHT(); // Probabilistic Hough Transform
+      break;
+    case Progressive:
+      this->m_Hough.PPHT(); // Progressive Probabilistic Hough Transform
+      break;
+    case Adaptive:
+      this->m_Hough.APHT(); // Adaptive Probabilistic Hough Transform
+      break;
+  }
 
   //hough.writePlanes("output");
   //hough.writePlanePoints("data/scans/scan000.3d");

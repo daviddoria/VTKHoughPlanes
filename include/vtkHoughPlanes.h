@@ -9,7 +9,7 @@ class vtkHoughPlanes : public vtkPolyDataAlgorithm
 {
 public:
   enum HoughAlgorithmEnum {
-  Randomized, Standard};//, PHT, PPHT, APHT, RANSAC};
+  Randomized, Standard, Probabilistic, Progressive, Adaptive};
 
   vtkTypeMacro(vtkHoughPlanes,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
