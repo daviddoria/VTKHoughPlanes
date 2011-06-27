@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
   houghPlanes->SetMinPlaneSize(100);
   houghPlanes->SetMinPlanarity(0.300);
   houghPlanes->SetPlaneRatio(0.1);
-  houghPlanes->SetPointDist(0.050);
+  houghPlanes->SetPointDist(0.150);
   houghPlanes->SetPeakWindow(false);
   houghPlanes->SetWindowSize(8);
   houghPlanes->SetTrashMax(20);
