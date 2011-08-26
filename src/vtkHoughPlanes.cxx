@@ -12,8 +12,6 @@
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
-#include <vtkLookupTable.h>
-#include <vtkPolyDataMapper.h>
 #include <vtkVertexGlyphFilter.h>
 
 #include <iostream>

@@ -88,6 +88,11 @@ void Hough::SetScan(Scan* scan)
 Hough::~Hough() {
   if(out.is_open()) out.close();
 
+  for(vector<ConvexPlane*>::iterator it = planes.begin(); 
+      it != planes.end(); it++) {
+      ConvexPlane* tmp = (*it);
+      delete tmp;
+  }
   delete acc;
   delete allPoints;
   
@@ -134,6 +139,7 @@ void Hough::RHT() {
         //cout << rho << " " << theta << " " << phi << endl;
         double * n = acc->getMax(rho, theta, phi);
         planeSize = deletePoints(n, rho);
+        delete[] n;
         cout << "Delete Points done " << plane << endl;
         if(planeSize < (int)myConfigFileHough.Get_MinPlaneSize()) counter++;
         end = GetCurrentTimeInMilliSec() - start;
@@ -813,9 +819,15 @@ int Hough::deletePoints(double * n, double rho) {
       point[0] = p2.x;
       point[1] = p2.y;
       point_list.push_back(point);
-      p.rgb[0] = rgb[0];
-      p.rgb[1] = rgb[1];
-      p.rgb[2] = rgb[2];
+      if(nocluster) {
+        p.rgb[0] = 0;
+        p.rgb[1] = 0;
+        p.rgb[2] = 0;
+      } else { 
+        p.rgb[0] = rgb[0];
+        p.rgb[1] = rgb[1];
+        p.rgb[2] = rgb[2];
+      }
       coloredPoints.push_back(p);
     } else {
       allPoints->push_back(p);
@@ -825,14 +837,29 @@ int Hough::deletePoints(double * n, double rho) {
   if(maxPlane < myConfigFileHough.Get_MinPlaneSize()) return maxPlane;
   vector<double *> convex_hull;
   ConvexPlane::JarvisMarchConvexHull(point_list,convex_hull);
+  
+  for(list<double* >::iterator it = point_list.begin();
+      it != point_list.end(); ) {
+      double* tmp = (*it);
+      delete[] tmp;
+      it = point_list.erase(it);
+  }
+  point_list.clear();
+  
+  if(nocluster) {
+    for(vector<double* >::iterator it = convex_hull.begin();
+      it != convex_hull.end(); it++) {
+      double* tmp = (*it);
+      delete[] tmp;
+    } 
+    return maxPlane; 
+  }
 
-  if(nocluster) return maxPlane; 
   ConvexPlane * plane1 = new ConvexPlane(n2, n2[3], direction, convex_hull);
   plane1->pointsize = maxPlane;
   planes.push_back(plane1);
 
   if(!quiet) cout << "Points left " << allPoints->size() << "\n";
-
   return maxPlane;
   // ENDE
 }
@@ -848,7 +875,18 @@ int Hough::cluster(vPtPair &pairs, double minx, double maxx, double miny, double
   int xlength = 1 + (maxx - minx) / factor;
   int ylength = 1 + (maxy - miny) / factor; 
 
-  int colors[ylength][xlength];
+  vector< vector<int> > colors;
+
+  for(int i = 0; i < ylength; i++) {
+    vector<int> *tmp = new vector<int>;
+    colors.push_back(*tmp);
+    for(int j = 0; j < xlength; j++) {
+      colors[i].push_back(0);
+    }
+    delete tmp;
+  }
+  
+  //int colors[ylength][xlength];
   bool points[ylength][xlength];
   int region = 0;
   for(int x = 0; x < xlength; x++) {
@@ -880,9 +918,9 @@ int Hough::cluster(vPtPair &pairs, double minx, double maxx, double miny, double
         if (left == 0) {
           if (up == 0) {
             colors[y][x] = ++region;            // new region
-            set<int> *joined = new set<int>;
-            joined->insert(region);
-            linked.push_back(*joined);
+            set<int> joined;
+            joined.insert(region);
+            linked.push_back(joined);
           } else {
             colors[y][x] = up;    // use upper region
           }
@@ -895,25 +933,25 @@ int Hough::cluster(vPtPair &pairs, double minx, double maxx, double miny, double
             }
             else {
               set<int> current;
-              set<int> *joined = new set<int>;
-              joined->insert(up);
-              joined->insert(left);
+              set<int> joined;
+              joined.insert(up);
+              joined.insert(left);
               for(vector<set<int> >::iterator itr = linked.begin(); itr != linked.end(); ) {
                 current = (*itr);
                 if(current.find(up) != current.end() || current.find(left) != current.end()) {
-                  set<int> *newjoined = new set<int>();
-                  insert_iterator<set<int> > res_ins(*newjoined, newjoined->begin());
+                  set<int> newjoined;
+                  insert_iterator<set<int> > res_ins(newjoined, newjoined.begin());
 
-                  set_union(joined->begin(), joined->end(), current.begin(), current.end(), res_ins); 
-                  joined->clear();
-                  delete joined;
+                  set_union(joined.begin(), joined.end(), current.begin(), current.end(), res_ins); 
+                  joined.clear();
+                 // delete joined;
                   joined = newjoined;
                   itr=linked.erase(itr);
                 } else {
                   itr++;
                 }
               }
-              linked.push_back(*joined);
+              linked.push_back(joined);
             }
           
         }
@@ -962,8 +1000,20 @@ int Hough::cluster(vPtPair &pairs, double minx, double maxx, double miny, double
       (*vitr).p2.z = -1;
     } 
   }
+  
+  /* 
+  for(int i = 0; i < ylength; i++) {
+    delete colors[i];
+  }
+  */        
+  /*            
+  for(vector<set<int> >::iterator itr = linked.begin(); itr != linked.end(); ) {
+    set<>current = (*itr);
+                if(current.find(up) != current.end() || current.find(left) != current.end()) {
+  */  
   return maxindex;
 }
+
 
 /**
   * Writes the convex hull of each detected plane to the directory given in the
@@ -1145,7 +1195,7 @@ double calcPlane(vector<Point> &ppoints, double plane[4]) {
     sum += D(i);
   }
   sum = D(index)/sum;
-
+  //cout << sum << " " << n << " " << D(index) << endl;
   return D(index)/n;
 }
 

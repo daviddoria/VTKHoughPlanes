@@ -41,6 +41,14 @@ bool ConvexPlane::furtherleft(double * start, double * point, double * end) {
   * point to the starting point.
   */
 void ConvexPlane::JarvisMarchConvexHull(list<double*> &points, vector<double*> &convex_hull) {
+  list<double*>::iterator it = points.begin();
+  for(int i = 0; i < 10; i++) {
+    double* tmp = (*it);
+    convex_hull.push_back(tmp);
+    it = points.erase(it);
+  }
+
+  return;
   cout << "Size: " << points.size() << endl;
   //pointOnHull = leftmost point in S
   list<double*>::iterator itr = points.begin();
@@ -54,7 +62,6 @@ void ConvexPlane::JarvisMarchConvexHull(list<double*> &points, vector<double*> &
   }
   double * anchor = (*end);
   convex_hull.push_back(anchor);
-  end = points.erase(end);
   double * start = convex_hull[0]; 
   double * current = (*points.begin());
 
@@ -75,6 +82,7 @@ void ConvexPlane::JarvisMarchConvexHull(list<double*> &points, vector<double*> &
     }
     current = anchor;
   } while(start != anchor);
+  convex_hull.pop_back();
   cout << "End of Convex " << convex_hull.size() << endl;
 }
 
@@ -103,19 +111,18 @@ vector<double*> _convex_hull) {
 ConvexPlane::ConvexPlane(double plane[4]) {
   for(int i = 0; i < 3; i++) {
     n[i] = plane[i];
-    rho = plane[3];
-    if(fabs(n[0]) < fabs(n[1])) {
-      if(fabs(n[1]) < fabs(n[2])) {
-        direction = 'z';
-      } else {
-        direction = 'y';
-      } 
-    } else if (fabs(n[2]) < fabs(n[0])){
-      direction = 'x';
-    } else {
+  }
+  rho = plane[3];
+  if(fabs(n[0]) < fabs(n[1])) {
+    if(fabs(n[1]) < fabs(n[2])) {
       direction = 'z';
-    }
-
+    } else {
+      direction = 'y';
+    } 
+  } else if (fabs(n[2]) < fabs(n[0])){
+    direction = 'x';
+  } else {
+    direction = 'z';
   }
 }
 
@@ -183,7 +190,13 @@ ConvexPlane::ConvexPlane(double plane[4], vector<Point> &points ) {
   if (point_list.size() > 0) {
     JarvisMarchConvexHull(point_list, convex_hull);
   }
-
+}
+ConvexPlane::~ConvexPlane() {
+  for(vector<double* >::iterator it = convex_hull.begin();
+    it != convex_hull.end(); it++) {
+    double* tmp = (*it);
+    delete[] tmp;
+  }
 }
 
 /**

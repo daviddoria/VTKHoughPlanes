@@ -24,6 +24,7 @@ public:
   ConvexPlane(double plane[4], vector<Point> &points );
   ConvexPlane(double plane[4]);
   ConvexPlane(vector<ConvexPlane*> &partialplanes);
+  ~ConvexPlane();
   void writePlane(std::string, int counter);
   void writeNormal(std::string, int counter);
   void project(const double *p, double *p1);
