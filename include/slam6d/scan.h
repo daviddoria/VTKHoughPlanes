@@ -30,13 +30,16 @@ using std::stringstream;
 #include "slam6d/searchTree.h"
 #include "slam6d/kdcache.h"
 #include "slam6d/globals.icc"
+#include "slam6d/scan_io.h"
+
 
 enum reader_type {
-  UOS, UOS_MAP, UOS_FRAMES, UOS_MAP_FRAMES, UOS_RGB, OLD, RTS, RTS_MAP, RIEGL_TXT, RIEGL_PROJECT, RIEGL_RGB, RIEGL_BIN, IFP, ZAHN, PLY, VTP, WRL, XYZ, ZUF, ASC, IAIS, FRONT, X3D, RXP, KIT, AIS, OCT, XYZR
+  UOS, UOS_MAP, UOS_FRAMES, UOS_MAP_FRAMES, UOS_RGB, OLD, RTS, RTS_MAP, RIEGL_TXT, RIEGL_PROJECT, RIEGL_RGB, RIEGL_BIN, IFP, ZAHN, PLY, VTP, WRL, XYZ, ZUF, ASC, IAIS, FRONT, X3D, RXP, KIT, AIS, OCT, XYZR};
+
+enum nns_type {
+  simpleKD, cachedKD, ANNTree, BOCTree //, NaboKD
 };
 
-// just some prototypes
-class ScanIO;
 
 /**
  * @brief 3D scan representation and implementation of scan matching
@@ -48,7 +51,7 @@ public:
   Scan(const double *euler, int maxDist = -1);
   Scan(const double rPos[3], const double rPosTheta[3], int maxDist = -1);
   Scan(const double _rPos[3], const double _rPosTheta[3], vector<double *> &pts);
-  Scan(const vector < Scan* >& MetaScan, bool use_cache, bool cuda_enabled);
+  Scan(const vector < Scan* >& MetaScan, int nns_method, bool cuda_enabled);
   Scan(const Scan& s);
 
   ~Scan();
@@ -81,8 +84,8 @@ public:
   void toGlobal(double voxelSize, int nrpts);
   void calcReducedPoints(double voxelSize, int nrpts = 0);
   
-  void createTree(bool use_cache, bool cuda_enabled);
-  static void createTrees(bool use_cache, bool cuda_enabled);
+  void createTree(int nns_method, bool cuda_enabled);
+  static void createTrees(int nns_method, bool cuda_enabled);
   static void deleteTrees();
 
   static KDCacheItem* initCache(const Scan* Source, const Scan* Target);
@@ -147,12 +150,10 @@ public:
 				    int start, int end, string &dir, int maxDist, int minDist,
 				    bool openFileForWriting = false);  
   static void readScansRedSearch(reader_type type,
-				    int start, int end, string &dir, int maxDist, int minDist,
-            double voxelSize, int nrpts, // reduction parameters
-            bool use_cache, bool cuda_enabled, 
-            bool openFileForWriting = false
-
-            );  
+						   int start, int end, string &dir, int maxDist, int minDist,
+						   double voxelSize, int nrpts, // reduction parameters
+						   int nns_method, bool cuda_enabled, 
+						   bool openFileForWriting = false);  
   inline const vector <Point>* get_points() const;
   inline double* const* get_points_red() const;
   inline void setPoints(vector <Point> *_points);
@@ -167,6 +168,26 @@ public:
   inline double** get_org_points_red() const;
 
 private:
+
+
+  class scanIOwrapper : public ScanIO {
+    public:
+
+    scanIOwrapper(reader_type type );
+    ~scanIOwrapper();
+
+    virtual int readScans(int start, int end, string &dir, int maxDist, int mindist,
+				    double *euler, vector<Point> &ptss); 
+    private:
+    ScanIO *my_ScanIO;
+
+#ifdef _MSC_VER
+    HINSTANCE hinstLib;
+#else
+    void *ptrScanIO;
+#endif
+
+  };
   
   /**
    * The pose of the scan
@@ -177,6 +198,18 @@ private:
          rPosTheta[3],  ///< 3D rotation in Euler representation 
          rQuat[4],      ///< 3D rotation in Quaternion representation
          transMat[16];  ///< (4x4) transformation matrix
+
+  
+  /**
+    * run ICP on GPU instead of CPU
+    */
+
+  bool cuda_enabled;
+  /**
+    * Defines the method used for nearest neighbor search
+    */
+
+  int nns_method;
 
   /**
    * The original pose of the scan, e.g., from odometry

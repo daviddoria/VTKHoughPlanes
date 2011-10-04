@@ -175,7 +175,7 @@ int vtkHoughPlanes::RequestData(vtkInformation *vtkNotUsed(request),
   }
 
   //hough.writePlanes("output");
-  //hough.writePlanePoints("data/scans/scan000.3d");
+  //this->m_Hough.writePlanePoints("data/scans/scan000.3d");
 
   // Color the points to a vtp file with a random color for each plane
   vtkSmartPointer<vtkPoints> outputPoints = vtkSmartPointer<vtkPoints>::New();

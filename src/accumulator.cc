@@ -165,7 +165,6 @@ double* AccumulatorSimple::accumulateRet(Point p) {
         double distance = p.x * n[0] + p.y * n[1] + p.z * n[2];
         if(fabs(distance-rho) < myConfigFileHough.Get_MaxPointPlaneDist()) {
           accumulator[k][i][j]++;
-          //if((unsigned int)accumulator[k][i][j] > myConfigFileHough.Get_AccumulatorMax()) {
           if(((unsigned int)accumulator[k][i][j] > myConfigFileHough.Get_AccumulatorMax() && (unsigned int)accumulator[k][i][j] > count*myConfigFileHough.Get_PlaneRatio())
           || (unsigned int)accumulator[k][i][j] > myConfigFileHough.Get_AccumulatorMax()) { 
             angles[0] = rho;
@@ -1283,13 +1282,11 @@ double* AccumulatorCube::accumulateRet(Point p) {
           double distance = p.x * n[0] + p.y * n[1] + p.z * n[2];
           if(fabs(distance-rho) < myConfigFileHough.Get_MaxPointPlaneDist()) {
             accumulator[i][j-1][k-1][l]++;
-           // if(accumulator[i][j-1][k-1][l] >  (int)myConfigFileHough.Get_AccumulatorMax()) {
-          if(((unsigned int)accumulator[i][j-1][k-1][l] > myConfigFileHough.Get_AccumulatorMax() 
+            if(((unsigned int)accumulator[i][j-1][k-1][l] > myConfigFileHough.Get_AccumulatorMax() 
             && (unsigned int)accumulator[i][j-1][k-1][l] >
             count*myConfigFileHough.Get_PlaneRatio()) ||
           (unsigned int)accumulator[i][j-1][k-1][l] > 10*myConfigFileHough.Get_AccumulatorMax() 
             ) {
-              angles[0] = rho;
               double polar[3];
               toPolar(n, polar);
               angles[0] = rho;
@@ -1613,8 +1610,6 @@ double* AccumulatorBallI::accumulateRet(Point p) {
         double distance = p.x * n[0] + p.y * n[1] + p.z * n[2];
         if(fabs(distance-rho) < myConfigFileHough.Get_MaxPointPlaneDist()) {
           accumulator[k][i][j]++;
-          //if((unsigned int)accumulator[k][i][j] >
-          //myConfigFileHough.Get_AccumulatorMax()) {
           if(((unsigned int)accumulator[k][i][j] >
           myConfigFileHough.Get_AccumulatorMax() && (unsigned
           int)accumulator[k][i][j] > count*myConfigFileHough.Get_PlaneRatio())  

@@ -34,7 +34,8 @@ target_link_libraries(scan_io_oct scanlib)
 ENDIF(WIN32)
 
 SET(SCANLIB_SRCS
-  kd.cc kdc.cc      scan.cc         point_type.cc	
+  kd.cc kdc.cc  kd ann_kd.cc    scan.cc d2tree.cc  point_type.cc	
 )
 
 add_library(scanlib STATIC ${SCANLIB_SRCS})
+target_link_libraries(scanlib)

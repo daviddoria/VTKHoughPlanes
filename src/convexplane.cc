@@ -41,20 +41,10 @@ bool ConvexPlane::furtherleft(double * start, double * point, double * end) {
   * point to the starting point.
   */
 void ConvexPlane::JarvisMarchConvexHull(list<double*> &points, vector<double*> &convex_hull) {
-  list<double*>::iterator it = points.begin();
-  for(int i = 0; i < 10; i++) {
-    double* tmp = (*it);
-    convex_hull.push_back(tmp);
-    it = points.erase(it);
-  }
-
-  return;
-  cout << "Size: " << points.size() << endl;
   //pointOnHull = leftmost point in S
   list<double*>::iterator itr = points.begin();
   list<double*>::iterator end = itr;
   while(itr != points.end()) {
-   // cout << (*end)[0] << " " << (*end)[1] << endl;
     if((*end)[0] > (*itr)[0]) {
       end = itr;
     }
@@ -62,27 +52,40 @@ void ConvexPlane::JarvisMarchConvexHull(list<double*> &points, vector<double*> &
   }
   double * anchor = (*end);
   convex_hull.push_back(anchor);
+  itr = points.begin();
   double * start = convex_hull[0]; 
   double * current = (*points.begin());
-
+  bool closed = true;
   do {
+    closed = true;
     itr = points.begin();
-    //cout << start[0] << " " << start[1] << endl;
+    end = points.begin();
     while(itr != points.end()) {
       if(furtherleft(start, (*itr), current)) {
         end = itr;
         current = (*end);
+        closed = false;
       }
       itr++;
     }
     start = current;
-    convex_hull.push_back(current);
-    if(end != points.end()) {
+    if(!closed) {
+      convex_hull.push_back(current);
       end = points.erase(end);
     }
     current = anchor;
   } while(start != anchor);
   convex_hull.pop_back();
+  
+  itr = points.begin();
+  while(itr != points.end()) {
+    if((*itr) == anchor) {
+      itr=points.erase(itr);
+      break;
+    } else {
+      itr++;
+    }
+  }
   cout << "End of Convex " << convex_hull.size() << endl;
 }
 
@@ -258,12 +261,11 @@ void ConvexPlane::writePlane(string path, int counter) {
 
   ofstream out;
   out.open(path.c_str());
-
+  
   for(vector<double*>::iterator it = convex_hull.begin();
       it != convex_hull.end();
       it++) {
 
-    
     switch(direction) {
       case 'x': 
         out << (rho - (*it)[0] * n[1] - (*it)[1] * n[2]) / n[0] << " ";

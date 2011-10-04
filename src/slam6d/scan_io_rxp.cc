@@ -142,9 +142,8 @@ void importer::on_echo_transformed(echo_type echo)
   }
   if(maxD == -1 || sqr(p.x) + sqr(p.y) + sqr(p.z) < maxD*maxD) {
     if(minD == -1 || sqr(p.x) + sqr(p.y) + sqr(p.z) > minD*minD) {
-       {//if(p.y > -200 && p.y < -50) {
-       //if((p.z * p.z + p.x * p.x) < 22500) { 
-         if(sqr(p.x) + sqr(p.y) + sqr(p.z) > 0.1)o->push_back(p);
+       {
+         if((sqr(p.x) + sqr(p.y) + sqr(p.z)) > 0.1)o->push_back(p);
        }
     }
   }

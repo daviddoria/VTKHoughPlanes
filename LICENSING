@@ -3,8 +3,8 @@ SLAM6D is released under the GPLv3 license, which is included in this
 document.
 
 In addition, the source code contains the 'newmat' library from Robert
-Davies and the 'csparse' library from Tim Davis; the viewer application
-uses the 'glui' extension by Paul Rademacher, all with their own license.
+Davies and a modified version of the ANN library from David Mount and 
+Sunil Arya with their own license.
 These libraries are provided just to simplify the installation of SLAM6D.
 
 ----

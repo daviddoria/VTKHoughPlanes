@@ -81,7 +81,6 @@ class bitoct{
   unsigned leaf               :  8;
 #else
 #ifdef BIT_64
-  cout << "blub" << endl;
   signed long child_pointer   : 48;
   unsigned valid              :  8;
   unsigned leaf               :  8;
@@ -232,7 +231,7 @@ public:
     uroot = new bitunion<T>();
     root = &uroot->node;
 
-    countPointsAndQueue(pts, n, newcenter, sizeNew, *root);
+    countPointsAndQueue(pts, n, newcenter, sizeNew, *root, center);
     init();
   }
 
@@ -281,7 +280,7 @@ public:
     uroot = new bitunion<T>();
     root = &uroot->node;
 
-    countPointsAndQueue(pts, newcenter, sizeNew, *root);
+    countPointsAndQueue(pts, newcenter, sizeNew, *root, center);
   }
 
   virtual ~BOctTree(){
@@ -477,6 +476,12 @@ public:
 
     return pointtype;
   }
+  
+  void getCenter(double _center[3]) const {
+    _center[0] = center[0];
+    _center[1] = center[1];
+    _center[2] = center[2];
+  }
 
 protected:
   
@@ -625,9 +630,21 @@ protected:
       if (  ( 1 << i ) & node.valid ) {   // if ith node exists
         if (  ( 1 << i ) & node.leaf ) {   // if ith node is leaf
           pointrep *points = children->points;
+          // new version to ignore leaves with less than 3 points
+          /* 
+          if(points[0].length > 2) { 
+            for(int tmp = 0; tmp < points[0].length; tmp++) {
+              T *point = &(points[POINTDIM*tmp+1].v);
+              c.push_back(point);
+            }
+          }
+          */  
+          //old version
+          
           int tmp = rand(points[0].length);
           T *point = &(points[POINTDIM*tmp+1].v);
           c.push_back(point);
+          
 
         } else { // recurse
           GetOctTreeRandom(c, children->node);
@@ -754,7 +771,7 @@ protected:
   void* branch( bitoct &node, vector<P*> &splitPoints, T _center[3], T _size) {
     // if bucket is too small stop building tree
     // -----------------------------------------
-    if ((_size <= voxelSize) || (earlystop && splitPoints.size() <= 1) ) {
+    if ((_size <= voxelSize) || (earlystop && splitPoints.size() <= 10) ) {
       // copy points
       pointrep *points = new pointrep[POINTDIM*splitPoints.size() + 1];
       points[0].length = splitPoints.size();
@@ -778,29 +795,16 @@ protected:
       childcenter(_center, newcenter[i], _size, i);
     }
 
-    countPointsAndQueue(splitPoints, newcenter, sizeNew, node);
+    countPointsAndQueue(splitPoints, newcenter, sizeNew, node, _center);
     return 0;
   }
 
   template <class P>
-  void countPointsAndQueue(vector<P*> &i_points, T center[8][3], T size, bitoct &parent) {
+  void countPointsAndQueue(vector<P*> &i_points, T center[8][3], T size, bitoct &parent, T *pcenter) {
     vector<P*> points[8];
     int n_children = 0;
-
-#ifdef _OPENMP 
-#pragma omp parallel for schedule(dynamic) 
-#endif
-    for (int j = 0; j < 8; j++) {
-      for (typename vector<P *>::iterator itr = i_points.begin(); itr != i_points.end(); itr++) {
-        if (fabs((*itr)[0] - center[j][0]) <= size) {
-          if (fabs((*itr)[1] - center[j][1]) <= size) {
-            if (fabs((*itr)[2] - center[j][2]) <= size) {
-              points[j].push_back(*itr);
-              continue;
-            }
-          }
-        }
-      }
+    for (typename vector<P *>::iterator itr = i_points.begin(); itr != i_points.end(); itr++) {
+      points[childIndex<P>(pcenter, *itr)].push_back( *itr );
     }
 
     i_points.clear();
@@ -831,23 +835,13 @@ protected:
   }
 
   template <class P>
-  void countPointsAndQueue(P * const* pts, int n,  T center[8][3], T size, bitoct &parent) {
+  void countPointsAndQueue(P * const* pts, int n,  T center[8][3], T size, bitoct &parent, T pcenter[3]) {
     vector<const P*> points[8];
     int n_children = 0;
-#ifdef _OPENMP 
-#pragma omp parallel for schedule(dynamic) 
-#endif
-    for (int j = 0; j < 8; j++) {
       for (int i = 0; i < n; i++) {
-        if (fabs(pts[i][0] - center[j][0]) <= size) {
-          if (fabs(pts[i][1] - center[j][1]) <= size) {
-            if (fabs(pts[i][2] - center[j][2]) <= size) {
-              points[j].push_back( pts[i] );
-            }
-          }
-        } 
-      }
+              points[childIndex<P>(pcenter, pts[i])].push_back( pts[i] );
     }
+    
     for (int j = 0; j < 8; j++) {
       // if non-empty set valid flag for this child
       if (!points[j].empty()) {
@@ -994,6 +988,10 @@ void childcenter(int x, int y, int z, int &cx, int &cy, int &cz, char i, int siz
       break;
   }
 }
+template <class P>
+inline unsigned char childIndex(const T *center, const P *point) {
+  return  (point[0] > center[0] ) | ((point[1] > center[1] ) << 1) | ((point[2] > center[2] ) << 2) ;
+}
 
 
   /**
@@ -1058,7 +1056,7 @@ void childcenter(int x, int y, int z, int &cx, int &cy, int &cz, char i, int siz
         if (myd2 <= 0.0001) {
           params[threadNum].closest_v = 0; // the search radius in units of voxelSize
         } else {
-          params[threadNum].closest_v = sqrt(myd2) * mult; // the search radius in units of voxelSize
+          params[threadNum].closest_v = sqrt(myd2) * mult + 1; // the search radius in units of voxelSize
         }
       }
       points+=BOctTree<T>::POINTDIM;
@@ -1082,7 +1080,7 @@ void childcenter(int x, int y, int z, int &cx, int &cy, int &cz, char i, int siz
     params[threadNum].x = (point[0] + add[0]) * mult;
     params[threadNum].y = (point[1] + add[1]) * mult;
     params[threadNum].z = (point[2] + add[2]) * mult;
-    params[threadNum].closest_v = sqrt(maxdist2) * mult; // the search radius in units of voxelSize
+    params[threadNum].closest_v = sqrt(maxdist2) * mult + 1; // the search radius in units of voxelSize
     params[threadNum].count = 0;
     params[threadNum].max_count = 10000; // stop looking after this many buckets
 

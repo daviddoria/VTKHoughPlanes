@@ -36,7 +36,7 @@ using std::endl;
  * @param euler Initital pose estimates (will not be applied to the points
  * @param ptss Vector containing the read points
  */
-int ScanIO_uos_rgb::readScans(int start, int end, string &dir, int maxDist, int mindist,
+int ScanIO_uos_rgb::readScans(int start, int end, string &dir, int maxDist, int minDist,
 			  double *euler, vector<Point> &ptss)
 {
   static int fileCounter = start;
@@ -46,6 +46,7 @@ int ScanIO_uos_rgb::readScans(int start, int end, string &dir, int maxDist, int 
   ifstream scan_in, pose_in;
 
   double maxDist2 = sqr(maxDist);
+  double minDist2 = sqr(minDist);
 
   int my_fileNr = fileCounter;
   
@@ -90,7 +91,8 @@ int ScanIO_uos_rgb::readScans(int start, int end, string &dir, int maxDist, int 
     // load points up to a certain distance only
     // maxDist2 = -1 indicates no limitation
     if (maxDist == -1 || sqr(p.x) + sqr(p.y) + sqr(p.z) < maxDist2)
-	 ptss.push_back(p);
+      if (minDist == -1 || sqr(p.x) + sqr(p.y) + sqr(p.z) > minDist2)
+	      ptss.push_back(p);
   }
   scan_in.close();
   scan_in.clear();
