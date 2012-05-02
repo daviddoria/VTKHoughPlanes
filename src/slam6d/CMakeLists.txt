@@ -1,6 +1,3 @@
-FIND_PACKAGE(VTK REQUIRED)
-INCLUDE(${VTK_USE_FILE})
-
 add_library(scan_io_uos             SHARED scan_io_uos.cc            )
 add_library(scan_io_uos_map         SHARED scan_io_uos_map.cc        )
 add_library(scan_io_uos_frames      SHARED scan_io_uos_frames.cc     )
@@ -27,7 +24,11 @@ add_library(scan_io_uos_rgb         SHARED scan_io_uos_rgb.cc        )
 add_library(scan_io_xyzr            SHARED scan_io_xyzr.cc           )
 add_library(scan_io_oct             SHARED scan_io_oct.cc point_type.cc)
 
-target_link_libraries(scan_io_vtp ${VTK_DIR}/bin/libvtkHybrid.so ${VTK_DIR}/bin/libvtklibxml2.so ${VTK_DIR}/bin/libvtkIO.so)
+if(VTK_LIBRARIES) # should be defined for later versions of VTK 5.x and above
+  target_link_libraries(scan_io_vtp ${VTK_LIBRARIES})
+else()
+  target_link_libraries(scan_io_vtp vtkHybrid vtklibxml2 vtkIO)
+endif()
 
 IF(WIN32)
 target_link_libraries(scan_io_oct scanlib)

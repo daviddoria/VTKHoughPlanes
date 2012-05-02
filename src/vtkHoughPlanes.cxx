@@ -1,12 +1,12 @@
 #include "vtkHoughPlanes.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
-#include "vtkDataObject.h"
-#include "vtkSmartPointer.h"
-
+#include <vtkObjectFactory.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkInformationVector.h>
+#include <vtkInformation.h>
+#include <vtkDataObject.h>
+#include <vtkSmartPointer.h>
+#include <vtkVersion.h>
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -209,9 +209,15 @@ int vtkHoughPlanes::RequestData(vtkInformation *vtkNotUsed(request),
   vtkSmartPointer<vtkPolyData> outputPointsPolyData = vtkSmartPointer<vtkPolyData>::New();
   outputPointsPolyData->SetPoints(outputPoints);
   outputPointsPolyData->GetPointData()->SetScalars(colors);
-  
+
   vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
-  vertexFilter->SetInputConnection(outputPointsPolyData->GetProducerPort());
+
+  #if VTK_MAJOR_VERSION <= 5
+    vertexFilter->SetInputConnection(outputPointsPolyData->GetProducerPort());
+  #else
+    vertexFilter->SetInputData(outputPointsPolyData);
+  #endif
+
   vertexFilter->Update();
 
   output->ShallowCopy(vertexFilter->GetOutput());
