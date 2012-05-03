@@ -31,20 +31,11 @@ OPTION(BIT_64 "Architecture is 64 Bit (default 32 Bit). ON/OFF" OFF)
 
 SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADDITIONAL_CFLAGS}")
 
-# Set output directories for libraries and executables
-SET( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib )
-SET( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/obj )
-SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
-
 # Set include directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/3rdparty/)
 include_directories(${CMAKE_SOURCE_DIR}/3rdparty/ann_1.1.1_modified/include)
 include_directories(${CMAKE_SOURCE_DIR}/3rdparty/ann_1.1.1_modified/src)
-
-# Set link directories
-link_directories(${CMAKE_SOURCE_DIR}/obj)
-link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 # Compile dependencies
 add_subdirectory(3rdparty)

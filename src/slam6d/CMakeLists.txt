@@ -31,7 +31,7 @@ else()
 endif()
 
 IF(WIN32)
-target_link_libraries(scan_io_oct scanlib)
+  target_link_libraries(scan_io_oct scanlib)
 ENDIF(WIN32)
 
 SET(SCANLIB_SRCS

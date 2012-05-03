@@ -12,7 +12,7 @@ using namespace NEWMAT;
 
 /**
   * Hough Constructor.
-  * Loads the Configfile, located in "bin/hough.cfg" and initializes the
+  * Loads the Configfile, "hough.cfg" and initializes the
   * accumulator. For details about the implemented Hough methods please read:
   *
   * Dorit Borrmann, Jan Elseberg, Kai Lingemann, and Andreas Nüchter. The 3D

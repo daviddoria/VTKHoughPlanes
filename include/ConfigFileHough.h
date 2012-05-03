@@ -1,7 +1,7 @@
 #ifndef _ConfigFileHough_
 #define _ConfigFileHough_
 
-#define DEF_CfgFileName         "bin/hough.cfg"
+#define DEF_CfgFileName         "hough.cfg"
 #define DEF_MaxDist             500
 #define DEF_MinDist             50
 #define DEF_AccumulatorMax      100

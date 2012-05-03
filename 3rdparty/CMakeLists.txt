@@ -1,4 +1,4 @@
-# Compile ANN library
+# Compile Aproximate Nearest Neighbor (ANN) library
 SET(ANN_DIR ${CMAKE_SOURCE_DIR}/3rdparty/ann_1.1.1_modified/src/)
 SET(ANN_SRCS 
   ${ANN_DIR}ANN.cpp
